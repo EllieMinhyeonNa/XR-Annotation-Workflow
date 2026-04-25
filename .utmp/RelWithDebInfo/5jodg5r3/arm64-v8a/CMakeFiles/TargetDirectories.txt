@@ -1,0 +1,5 @@
+/Users/ellie/01_Academic Works/03_MADE (2025-2026)/04_Spring 2026/CS/0224_XRHandsCaptureDemo/.utmp/RelWithDebInfo/5jodg5r3/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/ellie/01_Academic Works/03_MADE (2025-2026)/04_Spring 2026/CS/0224_XRHandsCaptureDemo/.utmp/RelWithDebInfo/5jodg5r3/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/ellie/01_Academic Works/03_MADE (2025-2026)/04_Spring 2026/CS/0224_XRHandsCaptureDemo/.utmp/RelWithDebInfo/5jodg5r3/arm64-v8a/GameActivity/CMakeFiles/game.dir
+/Users/ellie/01_Academic Works/03_MADE (2025-2026)/04_Spring 2026/CS/0224_XRHandsCaptureDemo/.utmp/RelWithDebInfo/5jodg5r3/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+/Users/ellie/01_Academic Works/03_MADE (2025-2026)/04_Spring 2026/CS/0224_XRHandsCaptureDemo/.utmp/RelWithDebInfo/5jodg5r3/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir

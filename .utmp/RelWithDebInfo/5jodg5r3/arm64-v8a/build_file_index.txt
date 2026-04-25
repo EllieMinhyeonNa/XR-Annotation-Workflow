@@ -1,0 +1,2 @@
+/Users/ellie/01_Academic Works/03_MADE (2025-2026)/04_Spring 2026/CS/0224_XRHandsCaptureDemo/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/CMakeLists.txt
+/Users/ellie/01_Academic Works/03_MADE (2025-2026)/04_Spring 2026/CS/0224_XRHandsCaptureDemo/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/CMakeLists.txt
