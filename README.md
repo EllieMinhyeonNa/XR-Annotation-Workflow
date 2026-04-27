@@ -8,10 +8,12 @@ A Unity-based VR application for Meta Quest 3 that allows users to draw 3D annot
 
 - **Hand Gesture Drawing**: Draw in 3D space using three-finger pinch gesture (thumb + index + middle finger)
 - **Touch-Based UI Interaction**: Poke buttons with index finger using simple collision detection
-- **Save Annotations**: Capture screenshots with annotation overlays
+- **Save Annotations**: Capture screenshots with annotation overlays on white background
 - **Delete Annotations**: Clear current drawings with a single button press
 - **In-VR Preview**: View saved screenshots immediately after saving
 - **Dual Hand Support**: Draw with either left or right hand
+- **Hand Visualization**: See 3D hand models in VR for natural interaction
+- **White Background**: Clean white background for clear screenshot captures (instead of passthrough)
 
 ## System Architecture
 
@@ -159,17 +161,21 @@ Access via:
 - Visual button feedback (color change)
 - In-VR preview of saved screenshots
 - Dual hand support (left/right)
+- White background for clear screenshots
+- Hand mesh visualization in VR
 
 ### In Progress 🚧
-- Annotation history panel
-- Annotation viewer/gallery
+- Annotation history panel (horizontal scrollable gallery)
+- Individual thumbnail display with delete buttons
+- Annotation viewer for full-screen viewing
 - Annotation renaming and management
-- Background customization (switching to white background)
 
 ### Future Enhancements 💡
+- Controller support version (separate APK with trigger-based drawing)
 - Multiple finger support for button interaction
 - Haptic feedback on button press
 - Sound effects for save/delete actions
+- Line color picker and customization
 - Annotation metadata (timestamps, tags)
 - Share/export functionality
 - Undo/redo for drawings

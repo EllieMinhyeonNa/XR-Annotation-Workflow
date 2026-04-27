@@ -1,254 +1,326 @@
-# XR Annotation Workflow - Hand Gesture Mode Setup Guide
+# XR Annotation Workflow - Setup Guide
 
 ## Overview
-This guide will help you set up the hand gesture annotation workflow system in Unity.
+This guide covers the complete setup for the hand gesture-based annotation workflow system in Unity for Meta Quest 3.
 
-**Note:** This is for HAND GESTURE mode only. Controller mode will be added later.
-
----
-
-## Scripts Created
-
-### Core System
-1. **AnnotationData.cs** - Data structure for annotations
-2. **AnnotationManager.cs** - Main manager (screenshot, save, load, delete)
-3. **AnnotationUIController.cs** - Controls Save/Delete buttons and counter
-
-### UI Components
-4. **AnnotationHistoryPanel.cs** - Right-side panel with thumbnails
-5. **AnnotationThumbnailItem.cs** - Individual thumbnail in history
-6. **AnnotationViewer.cs** - Full-screen viewer with rename/delete
-
-### Optional (Not Used)
-7. **FistClearSimple.cs** - Fist gesture clear (not needed - use Delete button instead)
+**Current Version:** Hand Gesture Mode (White Background)
+**Future Version:** Controller Mode (Separate APK - to be created later)
 
 ---
 
-## Unity Setup Steps
+## Project Structure
 
-### 1. Setup Stroke Organization
+### Core Scripts
 
-1. Create empty GameObject: `StrokeContainer_Right` (for right hand strokes)
-2. Create empty GameObject: `StrokeContainer_Left` (for left hand strokes, if using)
-3. These will organize your drawn strokes
+**Input & Interaction:**
+- `HandColliderSetup.cs` - Creates collision sphere on index finger for button poking
+- `SimpleTouchButton.cs` - Touch-based button system for VR
 
-### 2. Update DrawWhileThreePinch Components
+**Annotation System:**
+- `AnnotationManager.cs` - Core system for saving, loading, and managing annotations
+- `AnnotationData.cs` - Data structure for annotation metadata
+- `SavedAnnotationPreview.cs` - Shows saved screenshot preview in VR
 
-For each DrawWhileThreePinch component (right and left hand):
-1. Find the component in your scene
-2. In Inspector, find the new **Stroke Parent** field
-3. Assign the corresponding StrokeContainer:
-   - Right hand → `StrokeContainer_Right`
-   - Left hand → `StrokeContainer_Left`
+**History & Viewing (In Progress):**
+- `AnnotationHistoryPanel.cs` - Horizontal scrollable gallery of saved annotations
+- `AnnotationThumbnailItem.cs` - Individual thumbnail with delete button
+- `AnnotationUIController.cs` - Manages UI buttons and counters
+- `AnnotationViewer.cs` - Full-screen annotation viewer (future)
 
-### 3. Setup ClearDrawingsByDestroyChildren
-
-1. Find or create GameObject with `ClearDrawingsByDestroyChildren` component
-2. Configure in Inspector:
-   - **Stroke Roots**: Set size to 2 (or 1 if only using one hand)
-   - Element 0: Assign `StrokeContainer_Right`
-   - Element 1: Assign `StrokeContainer_Left` (if using both hands)
-   - **Enable Debug Logs**: Keep checked for testing
-
-### 4. Create AnnotationManager GameObject
-
-1. Create empty GameObject: `AnnotationManager`
-2. Add component: `AnnotationManager.cs`
-3. Configure in Inspector:
-   - **Capture Camera**: Assign your Main Camera
-   - **Screenshot Width**: 1920 (or desired resolution)
-   - **Screenshot Height**: 1080
-   - **Clear Drawings**: Assign your ClearDrawingsByDestroyChildren object
-
-### 2. Create UI Canvas (if not exists)
-
-1. Create UI Canvas (Screen Space - Camera for VR)
-2. Set Canvas camera to Main Camera
-3. Add Canvas Scaler component
-
-### 3. Create Main UI Panel (Save/Delete Buttons)
-
-Create a panel at the bottom with:
-- **Delete Button** (dark brown)
-- **Save Button** (dark brown)
-- **History Button** with counter text (shows "0 ≡")
-
-#### Setup:
-1. Create GameObject: `MainUI`
-2. Add component: `AnnotationUIController.cs`
-3. Assign in Inspector:
-   - **Save Button**: Your Save button
-   - **Delete Button**: Your Delete button
-   - **History Button**: Your counter button
-   - **Counter Text**: TextMeshPro showing the number
-   - **History Panel**: (assign after creating history panel)
-
-### 4. Create History Panel (Right Side)
-
-1. Create Panel: `HistoryPanel`
-2. Add `AnnotationHistoryPanel.cs` component
-3. Inside HistoryPanel, create:
-   - **ScrollView** with vertical layout
-   - **Content** area (this will hold thumbnails)
-   - **Close Button** (X button)
-
-4. Configure AnnotationHistoryPanel:
-   - **Thumbnail Prefab**: (create next)
-   - **Thumbnail Container**: Assign the ScrollView's Content
-   - **Close Button**: Assign X button
-
-### 5. Create Thumbnail Prefab
-
-1. Create new GameObject: `ThumbnailItem`
-2. Add these UI elements as children:
-   - **RawImage** - Shows screenshot thumbnail
-   - **Button** - Click to view (covers whole thumbnail)
-   - **Delete Button** - Small red X button in corner
-   - Optional: **TextMeshPro** - Shows annotation name
-
-3. Add component: `AnnotationThumbnailItem.cs`
-4. Assign in Inspector:
-   - **Thumbnail Image**: The RawImage
-   - **View Button**: The main button
-   - **Delete Button**: The red X button
-   - **Name Text**: (optional) TextMeshPro
-
-5. **Save as Prefab** in Assets folder
-
-### 6. Create Annotation Viewer (Full Screen)
-
-1. Create Panel: `AnnotationViewer` (full screen, initially disabled)
-2. Add component: `AnnotationViewer.cs`
-3. Add these UI children:
-   - **RawImage** (large, centered) - Shows full annotation
-   - **TMP InputField** - Shows/edits annotation name
-   - **Edit Button** (pencil icon) - Enables name editing
-   - **Delete Button** - Deletes this annotation
-   - **Close Button** - Closes viewer
-
-4. Configure AnnotationViewer:
-   - **Annotation Image**: The large RawImage
-   - **Name Input Field**: The TMP InputField
-   - **Edit Name Button**: Pencil button
-   - **Delete Button**: Delete button
-   - **Close Button**: Close button
-   - **Keyboard Panel**: (optional) Virtual keyboard
-
-### 7. Connect Everything to AnnotationManager
-
-Go back to AnnotationManager Inspector:
-- **History Panel**: Assign your HistoryPanel object
-- **Annotation Viewer**: Assign your AnnotationViewer object
-
-Also in HistoryPanel:
-- **Thumbnail Prefab**: Assign the ThumbnailItem prefab you created
-
-### 8. (Optional) FistClearSimple
-
-**Note:** You don't need this! Just use the Delete button instead.
-
-If you want fist gesture as an alternative way to clear:
-1. Add `FistClearSimple` component to a GameObject
-2. Assign fist detector and clear target
+**Drawing System:**
+- `DrawWhileThreePinch.cs` - Three-finger pinch drawing (already existed)
+- `ClearDrawingsByDestroyChildren.cs` - Clears drawn strokes
 
 ---
 
-## Hand Gesture Workflow Testing
+## Complete Setup Steps
 
-### 1. Draw with Three-Finger Pinch
-1. Make three-finger pinch gesture (thumb + index + middle)
-2. Pencil should appear
-3. Move hand to draw in 3D space
-4. Release pinch to stop drawing
+### Part 1: Drawing System Setup
 
-### 2. Save Annotation
-1. Draw some annotations
-2. **Tap Save button** (or use three-finger pinch gesture if configured)
-3. Screenshot captured
-4. Counter increments (0 → 1)
-5. Check console: "Annotation saved: capture_..."
+#### 1. Create Stroke Containers
+1. In Hierarchy, create empty GameObject: **StrokeContainer_Right**
+2. Create empty GameObject: **StrokeContainer_Left**
+3. These organize drawn strokes by hand
 
-### 3. Delete Current Drawings
-1. Draw some annotations
-2. **Tap Delete button**
-3. All current drawings cleared
-4. Counter stays the same (only clears unsaved drawings)
+#### 2. Connect Drawing Systems
+For each DrawWhileThreePinch component:
+1. Find DrawingSystem_R and DrawingSystem_L in Hierarchy
+2. In Inspector, assign **Stroke Parent**:
+   - Right hand → StrokeContainer_Right
+   - Left hand → StrokeContainer_Left
 
-### 4. View History Panel
-1. **Tap the counter button** (shows "1 ≡")
-2. Right panel opens with thumbnails
-3. See your saved annotation(s)
+#### 3. Setup Clear Manager
+1. Create empty GameObject: **ClearDrawingsManager**
+2. Add component: `ClearDrawingsByDestroyChildren`
+3. Configure:
+   - Stroke Roots: Size 2
+   - Element 0: StrokeContainer_Right
+   - Element 1: StrokeContainer_Left
 
-### 5. View Full Annotation
-1. In history panel, **tap a thumbnail**
-2. Full-screen viewer opens
-3. See large view of annotation
+---
 
-### 6. Rename Annotation
-1. In viewer, **tap pencil icon** next to name
-2. Virtual keyboard appears (if configured)
-3. Type new name
-4. Press enter or tap outside to save
+### Part 2: Button Interaction System
 
-### 7. Delete Saved Annotation
-1. Option A: In viewer, **tap Delete button**
-2. Option B: In history panel, **tap red X on thumbnail**
-3. Annotation deleted from history
-4. Counter decrements
+#### 4. Setup Hand Colliders
+On **Right Hand Tracking**:
+1. Add component: `HandColliderSetup`
+2. Configure:
+   - Handedness: Right
+   - Collider Radius: 0.015
+
+On **Left Hand Tracking**:
+1. Add component: `HandColliderSetup`
+2. Configure:
+   - Handedness: Left
+   - Collider Radius: 0.015
+
+#### 5. Setup Delete Button
+On **Button (Delete)**:
+1. Add component: `Box Collider`
+   - Is Trigger: ✅ Checked
+2. Add component: `SimpleTouchButton`
+3. Configure SimpleTouchButton:
+   - Normal Color: Your button's normal color
+   - Pressed Color: Bright color (green/white)
+   - On Button Pressed:
+     - Click +
+     - Drag AnnotationManager
+     - Select: AnnotationManager → DeleteCurrentDrawings()
+
+#### 6. Setup Save Button
+On **Button (Save)**:
+1. Add component: `Box Collider`
+   - Is Trigger: ✅ Checked
+2. Add component: `SimpleTouchButton`
+3. Configure SimpleTouchButton:
+   - Normal Color: Your button's normal color
+   - Pressed Color: Bright color (green/white)
+   - On Button Pressed:
+     - Click +
+     - Drag AnnotationManager
+     - Select: AnnotationManager → SaveAnnotation()
+
+---
+
+### Part 3: Annotation Manager Setup
+
+#### 7. Create Annotation Manager
+1. Create empty GameObject: **AnnotationManager**
+2. Add component: `AnnotationManager`
+3. Configure:
+   - Capture Camera: Main Camera
+   - Screenshot Width: 1920
+   - Screenshot Height: 1080
+   - Save Folder Name: "Annotations"
+   - Clear Drawings: ClearDrawingsManager
+
+---
+
+### Part 4: Visual Settings
+
+#### 8. Setup White Background
+On **Main Camera**:
+1. Disable **AR Camera Manager** component (uncheck it)
+2. In Camera component:
+   - Clear Flags: Solid Color
+   - Background: White (RGB: 255, 255, 255)
+
+#### 9. Setup Hand Visualization
+1. Find or create **Hand Visualizer** GameObject
+2. Add component: `HandVisualizer` (from XR Hands samples)
+3. Configure:
+   - Meta Quest Left Hand Mesh: Assign hand mesh
+   - Meta Quest Right Hand Mesh: Assign hand mesh
+   - Hand Mesh Material: HandsDefaultMaterial (or custom)
+   - Draw Meshes: ✅ Checked
+
+---
+
+### Part 5: Save Preview (Optional but Recommended)
+
+#### 10. Create Save Preview Panel
+1. Under Canvas, create UI → Panel: **SavePreviewPanel**
+2. Position in front of user (Y: 1.8, Z: 1.5)
+3. Add child: UI → Raw Image: **PreviewImage**
+4. Configure PreviewImage to fill panel (anchor stretch)
+
+#### 11. Add Preview Script
+On **SavePreviewPanel**:
+1. Add component: `SavedAnnotationPreview`
+2. Configure:
+   - Preview Image: Drag PreviewImage
+   - Display Duration: 3 seconds
+
+#### 12. Connect to Annotation Manager
+On **AnnotationManager**:
+- (No specific field needed - SavedAnnotationPreview subscribes to events automatically)
+
+#### 13. Start Hidden
+- Uncheck SavePreviewPanel in Inspector (starts disabled)
+
+---
+
+### Part 6: History Panel (In Progress)
+
+#### 14. Create History Panel Structure
+1. Under Canvas, create UI → Panel: **HistoryPanel**
+2. Position horizontally centered at top
+3. Add child: UI → Scroll View
+4. Configure Scroll View:
+   - Horizontal: ✅ Checked
+   - Vertical: ❌ Unchecked
+   - Delete Scrollbar Vertical
+
+#### 15. Setup Content Layout
+On **Content** (under Scroll View → Viewport):
+1. Add component: `Horizontal Layout Group`
+   - Padding: 10 all sides
+   - Spacing: 15
+   - Child Alignment: Middle Center
+2. Add component: `Content Size Fitter`
+   - Horizontal Fit: Preferred Size
+   - Vertical Fit: Unconstrained
+
+#### 16. Create Thumbnail Prefab
+1. Under Content, create UI → Image: **ThumbnailItem**
+2. Set size: 180x180
+3. Add component: `Button`
+4. Add child: UI → Raw Image (for screenshot)
+5. Add child: UI → Text (for filename)
+6. Add child: UI → Button (small, for delete ❌)
+7. Add component: `AnnotationThumbnailItem`
+8. Drag ThumbnailItem to Project folder (make prefab)
+9. Delete from Hierarchy
+
+#### 17. Connect History Panel
+On **HistoryPanel**:
+1. Add component: `AnnotationHistoryPanel`
+2. Configure:
+   - Content Transform: Content (from Scroll View)
+   - Thumbnail Prefab: ThumbnailItem prefab
+
+On **AnnotationManager**:
+- History Panel: Drag HistoryPanel
+
+#### 18. Setup History Button
+On **Button (History)**:
+1. Add component: `SimpleTouchButton` (if not already)
+2. Configure On Button Pressed:
+   - Drag HistoryPanel
+   - Select: GameObject → SetActive(bool)
+   - Check the checkbox ✅
+
+#### 19. Start History Panel Hidden
+- Uncheck HistoryPanel in Inspector (starts disabled)
+
+---
+
+## Testing Checklist
+
+### Hand Tracking & Drawing
+- [ ] Can see hand meshes in VR
+- [ ] Three-finger pinch creates pencil visual
+- [ ] Drawing creates white lines in space
+- [ ] Both hands can draw independently
+
+### Button Interaction
+- [ ] Index finger can poke Save button
+- [ ] Index finger can poke Delete button
+- [ ] Buttons change color when poked
+- [ ] Button colliders are positioned correctly
+
+### Save Workflow
+- [ ] Poke Save button captures screenshot
+- [ ] Preview panel appears showing saved image
+- [ ] Preview disappears after 3 seconds
+- [ ] Annotations remain visible after save
+- [ ] Files saved to Quest storage
+
+### Delete Workflow
+- [ ] Poke Delete button clears all drawings
+- [ ] Strokes disappear immediately
+- [ ] Can draw again after deleting
+
+### History Panel (When Completed)
+- [ ] History button shows saved thumbnails
+- [ ] Thumbnails scroll horizontally
+- [ ] Each thumbnail shows correct screenshot
+- [ ] Delete buttons work on individual items
+- [ ] Close button hides panel
 
 ---
 
 ## File Locations
 
-Annotations are saved to:
+### Saved Annotations
+**Quest 3:**
 ```
-Application.persistentDataPath/Annotations/
-```
-
-On Quest 2/3:
-```
-/sdcard/Android/data/[YourAppPackageName]/files/Annotations/
+/sdcard/Android/data/com.UnityTechnologies.com.unity.template.../files/Annotations/
 ```
 
-Each annotation is saved as:
-```
-[GUID].png
-```
+**Access via:**
+- Meta Quest Developer Hub → File Manager
+- USB connection with Android File Transfer (Mac)
+- ADB commands
 
 ---
 
 ## Troubleshooting
 
-### Save button does nothing
-- Check AnnotationManager has Main Camera assigned
-- Check Console for errors
-- Verify AnnotationUIController is connected to AnnotationManager
+### Buttons Not Responding
+- Verify Box Collider has "Is Trigger" enabled
+- Check HandColliderSetup on both hands
+- Verify SimpleTouchButton component on buttons
+- Test collider size (increase Z if needed)
 
-### Thumbnails don't appear
-- Check ThumbnailPrefab is assigned in HistoryPanel
-- Check ThumbnailContainer is the ScrollView's Content
-- Open Console and look for "Loaded X annotations" message
+### Screenshots Are Black
+- Verify AR Camera Manager is disabled
+- Check Camera background is set to Solid Color: White
+- Confirm Main Camera is assigned in AnnotationManager
 
-### Fist gesture doesn't work
-- Check FistDetector is assigned (DetectGesture component)
-- Check that DetectGesture has XRHandShape for fist gesture assigned
-- Enable Debug Logs and watch Console
-- Try making a tight fist (all fingers closed)
-- Check minimumDetectionThreshold in DetectGesture (try lowering it)
+### Hands Not Visible
+- Check Hand Visualizer component is enabled
+- Verify "Draw Meshes" is checked
+- Confirm hand mesh materials are assigned
+- Check hand tracking is enabled in Quest settings
 
-### Counter doesn't update
-- Check AnnotationUIController has counterText assigned
-- Check AnnotationManager events are being fired (add Debug.Logs)
+### Drawing Not Working
+- Verify Stroke Parent is assigned
+- Check three-finger pinch gesture detection
+- Confirm LineRenderer prefab is assigned
+- Test in Quest (hand tracking doesn't work in Unity Editor)
 
 ---
 
 ## Next Steps
 
-1. Create UI elements in Unity based on your mockups
-2. Test the hand gesture workflow thoroughly
-3. Adjust colors, sizes, positions to match your design
-4. Debug and refine gesture detection if needed
+### Completing History Panel
+1. Finish thumbnail prefab design
+2. Add delete functionality per thumbnail
+3. Add close button to history panel
+4. Test horizontal scrolling
+
+### Future Controller Version
+1. Duplicate scene
+2. Replace HandColliderSetup with XR Ray Interactor
+3. Replace DrawWhileThreePinch with controller trigger drawing
+4. Build separate APK for comparison
 
 ---
 
-Last Updated: 2026-04-25
+## Build Settings
+
+**Platform:** Android
+**Texture Compression:** ASTC
+**Minimum API Level:** Android 10.0 (API 29)
+**Target Devices:** Meta Quest 3
+**XR Plugin:** OpenXR
+**Hand Tracking:** Enabled
+
+---
+
+## Credits
+
+Developed for MADE Program - Spring 2026
+Built with Unity XR Hands and XR Interaction Toolkit
+Meta Quest 3 SDK
