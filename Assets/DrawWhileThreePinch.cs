@@ -17,6 +17,7 @@ public class DrawWhileThreePinch : MonoBehaviour
 
     [Header("Drawing")]
     public LineRenderer linePrefab;                 // StrokePrefab
+    public Transform strokeParent;                  // Parent for organizing strokes (optional)
     public float minDistance = 0.01f;
     public float lineWidth = 0.01f;
 
@@ -192,7 +193,8 @@ public class DrawWhileThreePinch : MonoBehaviour
     {
         if (linePrefab == null) return;
 
-        current = Instantiate(linePrefab);
+        // Create line renderer with optional parent
+        current = Instantiate(linePrefab, strokeParent);
         current.numCapVertices = 12;
         current.numCornerVertices = 12;
         current.useWorldSpace = true;
