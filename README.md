@@ -8,9 +8,14 @@ A Unity-based VR application for Meta Quest 3 that allows users to draw 3D annot
 
 - **Hand Gesture Drawing**: Draw in 3D space using three-finger pinch gesture (thumb + index + middle finger)
 - **Touch-Based UI Interaction**: Poke buttons with index finger using simple collision detection
-- **Save Annotations**: Capture screenshots with annotation overlays on white background
-- **Delete Annotations**: Clear current drawings with a single button press
-- **In-VR Preview**: View saved screenshots immediately after saving
+- **Save Annotations**: Capture screenshots (1920x1080) with annotation overlays on white background
+- **History Panel**: Horizontal panel displaying up to 3 most recent annotation thumbnails
+  - Automatic thumbnail generation with 16:9 aspect ratio (100x56)
+  - Rounded corners on thumbnails with masked screenshot display
+  - Filename labels below each thumbnail
+  - Individual delete buttons (red X) on each thumbnail
+- **Delete Annotations**: Clear current drawings or individual saved annotations
+- **Persistent Storage**: Annotations saved to device storage and automatically loaded on app restart
 - **Dual Hand Support**: Draw with either left or right hand
 - **Hand Visualization**: See 3D hand models in VR for natural interaction
 - **White Background**: Clean white background for clear screenshot captures (instead of passthrough)
@@ -32,17 +37,40 @@ A Unity-based VR application for Meta Quest 3 that allows users to draw 3D annot
 
 #### Annotation Management
 - **AnnotationManager.cs**: Core system for saving and managing annotations
-  - Captures screenshots from main camera
+  - Captures screenshots from main camera (1920x1080)
   - Saves PNG files to persistent data path
   - Manages annotation data and events
+  - Loads saved annotations from disk on startup
+  - Supports clearing all annotations (for testing/debugging)
 
 - **AnnotationData.cs**: Data structure for annotation metadata
   - Stores screenshot texture, timestamp, and file path
   - Generates unique IDs for each annotation
+  - Tracks display names for user customization
 
-- **SavedAnnotationPreview.cs**: In-VR preview system
-  - Displays saved screenshots on UI panel after saving
-  - Auto-hides after 3 seconds
+- **AnnotationHistoryPanel.cs**: History panel management
+  - Displays up to 3 most recent annotation thumbnails
+  - Dynamically creates thumbnail instances from prefab
+  - Horizontal layout with automatic spacing and centering
+  - Auto-refreshes when annotations are added or removed
+
+- **AnnotationThumbnailItem.cs**: Individual thumbnail component
+  - Displays screenshot preview with 16:9 aspect ratio
+  - Shows filename label
+  - Individual delete button with VR poke support
+  - Click to view full annotation (connects to viewer)
+
+- **ThumbnailItem1.prefab**: Reusable thumbnail prefab
+  - Rounded background with mask for screenshot clipping
+  - Raw Image for screenshot display
+  - TextMeshPro label for filename
+  - Delete button with Box Collider for VR interaction
+
+- **AnnotationViewer.cs**: Full-screen annotation viewer
+  - Large image display
+  - Editable name field with keyboard support
+  - Delete and close functionality
+  - (UI implementation in progress)
 
 #### Drawing System
 - **ClearDrawingsByDestroyChildren.cs**: Utility for clearing drawn strokes
@@ -53,21 +81,23 @@ A Unity-based VR application for Meta Quest 3 that allows users to draw 3D annot
 
 ```
 Assets/
-├── HandColliderSetup.cs           # Index finger collision detection
-├── SimpleTouchButton.cs           # Touch-based button interaction
-├── SavedAnnotationPreview.cs      # In-VR screenshot preview
-├── AnnotationManager.cs           # Main annotation system
-├── AnnotationData.cs              # Annotation data structure
-├── AnnotationUIController.cs      # UI management (future use)
-├── AnnotationHistoryPanel.cs      # History display (future use)
-├── AnnotationViewer.cs            # Annotation viewer (future use)
-├── AnnotationThumbnailItem.cs     # Thumbnail items (future use)
-└── ClearDrawingsByDestroyChildren.cs  # Drawing cleanup utility
+├── HandColliderSetup.cs                    # Index finger collision detection
+├── SimpleTouchButton.cs                    # Touch-based button interaction
+├── AnnotationManager.cs                    # Main annotation system
+├── AnnotationData.cs                       # Annotation data structure
+├── AnnotationHistoryPanel.cs               # History panel (3 thumbnails max)
+├── AnnotationThumbnailItem.cs              # Individual thumbnail component
+├── AnnotationViewer.cs                     # Full-screen viewer (UI in progress)
+├── AnnotationUIController.cs               # UI management (future use)
+├── ThumbnailItem1.prefab                   # Thumbnail prefab template
+├── ClearDrawingsByDestroyChildren.cs       # Drawing cleanup utility
+└── SavedAnnotationPreview.cs               # In-VR screenshot preview (legacy)
 
 Scenes/
-└── Annotation Workflow.unity      # Main VR scene
+└── Annotation Workflow.unity               # Main VR scene
 
-SETUP_GUIDE.md                     # Detailed setup instructions
+README.md                                   # Project overview
+SETUP_GUIDE.md                              # Detailed setup instructions
 ```
 
 ## How It Works
@@ -156,19 +186,24 @@ Access via:
 ### Working Features ✅
 - Three-finger pinch drawing gesture
 - Index finger button poking
-- Save button with screenshot capture
-- Delete button with immediate clear
+- Save button with screenshot capture (1920x1080)
+- Delete button with immediate clear (clears current drawings)
+- Delete all saved annotations button (for testing)
 - Visual button feedback (color change)
-- In-VR preview of saved screenshots
+- History panel with 3 most recent thumbnails
+- Individual delete buttons on each thumbnail (red X)
+- Thumbnail generation with rounded corners
+- Filename labels on thumbnails
+- Persistent storage (saves/loads annotations)
+- Automatic thumbnail limit (keeps only 3 most recent)
 - Dual hand support (left/right)
 - White background for clear screenshots
 - Hand mesh visualization in VR
 
 ### In Progress 🚧
-- Annotation history panel (horizontal scrollable gallery)
-- Individual thumbnail display with delete buttons
-- Annotation viewer for full-screen viewing
-- Annotation renaming and management
+- Annotation viewer UI (full-screen display)
+- Annotation renaming with keyboard
+- Click thumbnail to view full annotation
 
 ### Future Enhancements 💡
 - Controller support version (separate APK with trigger-based drawing)

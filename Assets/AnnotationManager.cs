@@ -138,6 +138,32 @@ public class AnnotationManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Delete ALL saved annotations (for testing/debugging)
+    /// </summary>
+    public void ClearAllSavedAnnotations()
+    {
+        // Delete all files from disk
+        string folderPath = Path.Combine(Application.persistentDataPath, saveFolderName);
+        if (Directory.Exists(folderPath))
+        {
+            string[] files = Directory.GetFiles(folderPath, "*.png");
+            foreach (string file in files)
+            {
+                File.Delete(file);
+            }
+        }
+
+        // Clear the list
+        savedAnnotations.Clear();
+
+        // Update UI
+        if (historyPanel != null)
+            historyPanel.RefreshThumbnails();
+
+        Debug.Log("All saved annotations cleared!");
+    }
+
+    /// <summary>
     /// Rename an annotation
     /// </summary>
     public void RenameAnnotation(AnnotationData annotation, string newName)

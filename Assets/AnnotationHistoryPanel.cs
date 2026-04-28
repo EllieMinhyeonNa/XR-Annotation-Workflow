@@ -12,15 +12,19 @@ public class AnnotationHistoryPanel : MonoBehaviour
     [SerializeField] private Transform thumbnailContainer; // ScrollView content area
     [SerializeField] private Button closeButton;
 
+    [Header("Settings")]
+    [SerializeField] private int maxThumbnails = 3;  // Maximum number of thumbnails to show
+
     private Dictionary<AnnotationData, GameObject> thumbnailObjects = new Dictionary<AnnotationData, GameObject>();
+    private List<AnnotationData> displayedAnnotations = new List<AnnotationData>();
 
     void Start()
     {
         if (closeButton != null)
             closeButton.onClick.AddListener(ClosePanel);
 
-        // Start hidden
-        gameObject.SetActive(false);
+        // Start hidden - COMMENTED OUT to keep panel always visible
+        // gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -58,9 +62,17 @@ public class AnnotationHistoryPanel : MonoBehaviour
             return;
         }
 
+        // If we've reached the max limit, remove the oldest thumbnail
+        if (displayedAnnotations.Count >= maxThumbnails)
+        {
+            AnnotationData oldestAnnotation = displayedAnnotations[0];
+            RemoveAnnotationThumbnail(oldestAnnotation);
+        }
+
         // Create thumbnail object
         GameObject thumbnailObj = Instantiate(thumbnailPrefab, thumbnailContainer);
         thumbnailObjects[annotation] = thumbnailObj;
+        displayedAnnotations.Add(annotation);
 
         // Set up thumbnail
         var thumbnailItem = thumbnailObj.GetComponent<AnnotationThumbnailItem>();
@@ -83,6 +95,7 @@ public class AnnotationHistoryPanel : MonoBehaviour
         {
             Destroy(thumbnailObj);
             thumbnailObjects.Remove(annotation);
+            displayedAnnotations.Remove(annotation);
         }
     }
 
@@ -98,9 +111,12 @@ public class AnnotationHistoryPanel : MonoBehaviour
         if (AnnotationManager.Instance != null)
         {
             var annotations = AnnotationManager.Instance.GetAllAnnotations();
-            foreach (var annotation in annotations)
+
+            // Only show the most recent 'maxThumbnails' annotations
+            int startIndex = Mathf.Max(0, annotations.Count - maxThumbnails);
+            for (int i = startIndex; i < annotations.Count; i++)
             {
-                AddAnnotationThumbnail(annotation);
+                AddAnnotationThumbnail(annotations[i]);
             }
         }
     }
@@ -116,5 +132,6 @@ public class AnnotationHistoryPanel : MonoBehaviour
                 Destroy(thumbnailObj);
         }
         thumbnailObjects.Clear();
+        displayedAnnotations.Clear();
     }
 }

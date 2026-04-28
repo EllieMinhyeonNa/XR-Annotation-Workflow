@@ -64,7 +64,7 @@ public class AnnotationThumbnailItem : MonoBehaviour
     /// <summary>
     /// Called when user clicks the delete (X) button
     /// </summary>
-    private void OnDeleteClicked()
+    public void OnDeleteClicked()
     {
         if (AnnotationManager.Instance != null && annotationData != null)
         {
